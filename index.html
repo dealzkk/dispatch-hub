@@ -337,7 +337,7 @@
       rows.forEach(r => {
         const d = document.createElement('div'); d.className = 'result-group';
         d.innerHTML = `<table class="table table-sm table-borderless mb-2">
-          <tr><td><strong>〒</strong></td><td>${r.postal_code}</td></tr><tr><td><strong>EN</strong></td><td>${r.english_address}</td></tr><tr><td><strong>JP</strong></td><td>${r.japanese_address}</td></tr>
+          <tr><td><strong>〒</strong></td><td>${r.postal}</td></tr><tr><td><strong>EN</strong></td><td>${r.english_address}</td></tr><tr><td><strong>JP</strong></td><td>${r.japanese_address}</td></tr>
         </table><button class="btn btn-success btn-sm w-100" onclick="copyIt('${r.postal}\\n${r.english_address}\\n${r.japanese_address}', this)">Copy All Details</button>`;
         cont.appendChild(d);
       });
