@@ -288,7 +288,7 @@
     function ph_onPrefChange() {
       const p = document.getElementById('ph_pref').value;
       const s = document.getElementById('ph_city');
-      s.innerHTML = '<option value="">City/Mun</option>';
+      s.innerHTML = '<option value="">City/Municipality</option>';
       if(p) Object.keys(treePH[p]).sort().forEach(c => s.add(new Option(c, c)));
     }
     function ph_onCityChange() {
