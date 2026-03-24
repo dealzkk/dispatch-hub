@@ -87,6 +87,7 @@
     textarea.form-control {
       resize: none;
       overflow: hidden;
+      min-height: 45px;
     }
 
     .calc-summary-grid {
@@ -149,7 +150,7 @@
             <div class="position-relative">
               <label class="form-label">Output (Proper Case)</label>
               <span id="copyAlert" class="text-success ms-2 fade-out hidden" style="font-size: 0.7rem; font-weight: bold;">Copied!</span>
-              <textarea class="form-control" id="outputText" rows="1" readonly style="cursor: pointer; background-color: #f0f7ff; border-color: #cfe2ff;"></textarea>
+              <textarea class="form-control" id="outputText" rows="1" readonly style="cursor: pointer; background-color: #fff8f0; border-color: #ffe5d0;"></textarea>
               <small class="text-muted" style="font-size: 0.7rem;">Click box to copy</small>
             </div>
 
@@ -211,7 +212,7 @@
             <h4 class="section-title sticky-title"><i class="fa-solid fa-map-location-dot me-2"></i> PHL Address Search</h4>
             <label class="form-label">Quick Search</label>
             <div class="input-group mb-3">
-              <input type="text" id="ph_zip" class="form-control" placeholder="Zip Code">
+              <input type="text" id="ph_zip" class="form-control" placeholder="Zip Code" onkeyup="if(event.key==='Enter') ph_zipSearch()">
               <button class="btn btn-primary px-3" onclick="ph_zipSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
             <label class="form-label">Filter by Location</label>
@@ -229,7 +230,7 @@
             <h4 class="section-title sticky-title"><i class="fa-solid fa-house-chimney-window me-2"></i> JPN Address Search</h4>
             <label class="form-label">Quick Search</label>
             <div class="input-group mb-3">
-              <input type="text" id="jp_zip" class="form-control" placeholder="Postal Code">
+              <input type="text" id="jp_zip" class="form-control" placeholder="Postal Code" onkeyup="if(event.key==='Enter') jp_zipSearch()">
               <button class="btn btn-primary px-3" onclick="jp_zipSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
             <label class="form-label">Filter by Location</label>
@@ -315,7 +316,7 @@
       setTimeout(() => alert.classList.add('hidden'), 2000);
     });
 
-    /* Address Logics remain unchanged... */
+    /* PH Address Logic */
     function ph_onPrefChange() {
       const p = document.getElementById('ph_pref').value;
       const s = document.getElementById('ph_city');
@@ -343,6 +344,8 @@
         cont.appendChild(d);
       });
     }
+
+    /* JP Address Logic */
     function jp_onPrefChange() {
       const p = document.getElementById('jp_pref').value;
       const s = document.getElementById('jp_city');
