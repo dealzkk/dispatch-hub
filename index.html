@@ -338,7 +338,7 @@
       const cont = document.getElementById('ph_results'); cont.innerHTML = '';
       rows.forEach(r => {
         const d = document.createElement('div'); d.className = 'result-group';
-        d.innerHTML = `<table class="table table-sm table-borderless mb-2"><tr><td><strong>Address</strong></td><td>${r.address} ${r.postal}</td></tr></table>
+        d.innerHTML = `<table class="table table-sm table-borderless mb-2"><tr><td><strong>Address</strong></td><td>${r.address} ${r.postal}</td></tr><tr><td><strong>Group</strong></td><td>${r.island_group}</td></tr><tr><td><strong>ETA</strong></td><td>${r.lead_time}</td></tr><tr><td><strong>LBC</strong></td><td>${r.lbc_days}</td></tr></table>
         <button class="btn btn-success btn-sm w-100" onclick="copyIt('${r.address} ${r.postal}', this)">Copy Address</button>`;
         cont.appendChild(d);
       });
