@@ -23,7 +23,6 @@
       color: #1c1e21;
     }
 
-    /* Container fills 100% of the screen minus the padding */
     .app-wrapper {
       height: 100vh;
       padding: 15px;
@@ -36,12 +35,11 @@
       flex-direction: column;
     }
 
-    /* Each tool card is scrollable individually */
     .tool-card {
       background: #ffffff;
       padding: 24px;
       border-radius: 12px;
-      border: 1px solid #dee2e6; /* Flat border, no shadow */
+      border: 1px solid #dee2e6;
       height: 100%;
       overflow-y: auto;
       overflow-x: hidden;
@@ -49,7 +47,6 @@
       flex-direction: column;
     }
 
-    /* Custom Scrollbar for the cards */
     .tool-card::-webkit-scrollbar { width: 5px; }
     .tool-card::-webkit-scrollbar-track { background: transparent; }
     .tool-card::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
@@ -60,11 +57,14 @@
       margin-bottom: 1.25rem;
       display: flex;
       align-items: center;
+      background: white;
+      padding-bottom: 10px;
+    }
+
+    .sticky-title {
       position: sticky;
       top: 0;
-      background: white;
       z-index: 10;
-      padding-bottom: 10px;
     }
 
     .form-label {
@@ -83,19 +83,28 @@
       font-size: 0.9rem;
     }
 
-    /* Data rows for the calculator results */
-    .data-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #f1f3f5;
+    /* REMOVE TEXTAREA SCROLLBARS AND RESIZE HANDLE */
+    textarea.form-control {
+      resize: none;
+      overflow: hidden;
     }
-    
-    .data-row:last-of-type { border-bottom: none; }
 
-    .data-label { font-size: 0.9rem; font-weight: 500; color: #4a4a4a; }
-    .data-value { font-weight: 700; font-size: 1rem; color: #1c1e21; }
+    .calc-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .summary-box {
+      padding: 8px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+    }
+    .summary-box .data-label { font-size: 0.65rem; display: block; }
+    .summary-box .data-value { font-size: 0.85rem; display: block; }
+    .summary-highlight { background: #f0f7ff; border-color: #cfe2ff; }
 
     .btn-primary { background-color: #0070ba; border: none; font-weight: 600; }
     .btn-success { font-weight: 600; font-size: 0.85rem; }
@@ -114,12 +123,15 @@
       border-radius: 12px;
       padding: 20px;
       text-align: center;
-      margin-top: auto;
+      margin-top: 10px;
     }
 
     .peso-total { font-size: 2rem; font-weight: 800; color: #0070ba; }
     .hidden { display: none; }
-    hr { border-color: #edf2f7; margin: 15px 0; }
+    hr { border-color: #edf2f7; margin: 20px 0; }
+
+    .fade-out { opacity: 1; transition: opacity 0.5s ease; }
+    .fade-out.hidden { opacity: 0; }
   </style>
 </head>
 <body>
@@ -130,7 +142,20 @@
         
         <div class="col-lg-4 tool-column">
           <div class="tool-card">
-            <h4 class="section-title"><i class="fa-solid fa-money-bill-1-wave me-2"></i> Express Service Estimate</h4>
+            <h4 class="section-title"><i class="fa-solid fa-font me-2"></i> Case Converter</h4>
+            <label class="form-label">Input Text</label>
+            <textarea class="form-control mb-3" id="inputText" rows="1" placeholder="Paste text..."></textarea>
+            
+            <div class="position-relative">
+              <label class="form-label">Output (Proper Case)</label>
+              <span id="copyAlert" class="text-success ms-2 fade-out hidden" style="font-size: 0.7rem; font-weight: bold;">Copied!</span>
+              <textarea class="form-control" id="outputText" rows="1" readonly style="cursor: pointer; background-color: #f0f7ff; border-color: #cfe2ff;"></textarea>
+              <small class="text-muted" style="font-size: 0.7rem;">Click box to copy</small>
+            </div>
+
+            <hr>
+
+            <h4 class="section-title sticky-title"><i class="fa-solid fa-money-bill-1-wave me-2"></i> Express Estimate</h4>
             
             <label class="form-label">Item Price (JPY)</label>
             <div class="input-group mb-3">
@@ -158,18 +183,18 @@
               <input type="number" id="calc_custom_val" class="form-control" oninput="runCalc()">
             </div>
 
-            <div class="py-2">
-              <div class="data-row">
-                <span class="data-label">Subtotal (Inc. Shipping)</span>
-                <span class="data-value" id="res_subtotal">¥0.00</span>
+            <div class="calc-summary-grid">
+              <div class="summary-box">
+                <span class="data-label">Subtotal</span>
+                <span class="data-value" id="res_subtotal">¥0</span>
               </div>
-			  <div class="data-row">
-                <span class="data-label">Platform Fee (5%)</span>
-                <span class="data-value" id="res_fee">¥0.00</span>
+              <div class="summary-box">
+                <span class="data-label">Fee (5%)</span>
+                <span class="data-value" id="res_fee">¥0</span>
               </div>
-              <div class="data-row" style="background: #f0f7ff; margin: 5px -10px; padding: 10px; border-radius: 6px;">
-                <span class="data-label" style="font-weight: 700;">TOTAL JPY</span>
-                <span class="data-value" id="res_yen" style="font-size: 1.2rem; color: #0070ba;">¥0.00</span>
+              <div class="summary-box summary-highlight">
+                <span class="data-label" style="font-weight:700; color:#0070ba;">TOTAL JPY</span>
+                <span class="data-value" id="res_yen" style="font-weight:800; color:#0070ba;">¥0</span>
               </div>
             </div>
 
@@ -183,21 +208,17 @@
 
         <div class="col-lg-4 tool-column">
           <div class="tool-card">
-            <h4 class="section-title"><i class="fa-solid fa-map-location-dot me-2"></i> PHL Address Search</h4>
-            
+            <h4 class="section-title sticky-title"><i class="fa-solid fa-map-location-dot me-2"></i> PHL Address Search</h4>
             <label class="form-label">Quick Search</label>
             <div class="input-group mb-3">
               <input type="text" id="ph_zip" class="form-control" placeholder="Zip Code">
               <button class="btn btn-primary px-3" onclick="ph_zipSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
-
             <label class="form-label">Filter by Location</label>
             <select id="ph_pref" class="form-select mb-2" onchange="ph_onPrefChange()"><option value="">Province</option></select>
             <select id="ph_city" class="form-select mb-2" onchange="ph_onCityChange()"><option value="">City/Municipality</option></select>
             <select id="ph_town" class="form-select mb-3"><option value="">Barangay</option></select>
-            
             <button class="btn btn-primary w-100 mb-2" onclick="ph_locSearch()">Search Location</button>
-            
             <hr>
             <div id="ph_results"></div>
           </div>
@@ -205,21 +226,17 @@
 
         <div class="col-lg-4 tool-column">
           <div class="tool-card">
-            <h4 class="section-title"><i class="fa-solid fa-house-chimney-window me-2"></i> JPN Address Search</h4>
-            
+            <h4 class="section-title sticky-title"><i class="fa-solid fa-house-chimney-window me-2"></i> JPN Address Search</h4>
             <label class="form-label">Quick Search</label>
             <div class="input-group mb-3">
               <input type="text" id="jp_zip" class="form-control" placeholder="Postal Code">
               <button class="btn btn-primary px-3" onclick="jp_zipSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
-
             <label class="form-label">Filter by Location</label>
             <select id="jp_pref" class="form-select mb-2" onchange="jp_onPrefChange()"><option value="">Prefecture</option></select>
             <select id="jp_city" class="form-select mb-2" onchange="jp_onCityChange()"><option value="">City</option></select>
             <select id="jp_town" class="form-select mb-3"><option value="">Town</option></select>
-            
             <button class="btn btn-primary w-100 mb-2" onclick="jp_locSearch()">Search Location</button>
-            
             <hr>
             <div id="jp_results"></div>
           </div>
@@ -237,7 +254,6 @@
     let treePH = {}, treeJP = {};
 
     window.onload = () => {
-      // Load PH Data
       Papa.parse(CSV_PH, { download: true, header: true, complete: (r) => { 
         dataPH = r.data; 
         dataPH.forEach(row => {
@@ -249,7 +265,6 @@
         const s = document.getElementById('ph_pref');
         Object.keys(treePH).sort().forEach(p => s.add(new Option(p, p)));
       }});
-      // Load JP Data
       Papa.parse(CSV_JP, { download: true, header: true, complete: (r) => { 
         dataJP = r.data;
         dataJP.forEach(row => {
@@ -263,7 +278,6 @@
       }});
     };
 
-    /* PayPal logic */
     function toggleCustomShip() {
       const v = document.getElementById('calc_ship_select').value;
       document.getElementById('calc_custom_div').className = (v === 'custom' ? 'mb-3' : 'hidden');
@@ -273,18 +287,35 @@
       let p = parseFloat(document.getElementById('calc_price').value) || 0;
       let sV = document.getElementById('calc_ship_select').value;
       let s = sV === 'custom' ? (parseFloat(document.getElementById('calc_custom_val').value) || 0) : parseFloat(sV);
-      
       let subtotal = p + s;
       let f = subtotal * 0.05;
       let ty = subtotal + f;
-      
-      document.getElementById('res_fee').innerText = '¥' + f.toLocaleString();
+      document.getElementById('res_fee').innerText = '¥' + Math.round(f).toLocaleString();
       document.getElementById('res_subtotal').innerText = '¥' + subtotal.toLocaleString();
-      document.getElementById('res_yen').innerText = '¥' + ty.toLocaleString();
+      document.getElementById('res_yen').innerText = '¥' + Math.round(ty).toLocaleString();
       document.getElementById('res_php').innerText = '₱' + (ty * 0.4).toLocaleString(undefined, {minimumFractionDigits:2});
     }
 
-    /* PH Address Logic */
+    /* Case Converter Logic */
+    function toProperCase(text) {
+      return text.replace(/\w\S*/g, (word) =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      );
+    }
+    document.getElementById('inputText').addEventListener('input', function () {
+      document.getElementById('outputText').value = toProperCase(this.value);
+    });
+    document.getElementById('outputText').addEventListener('click', function () {
+      if(!this.value) return;
+      const el = document.createElement('textarea');
+      el.value = this.value; document.body.appendChild(el);
+      el.select(); document.execCommand('copy'); document.body.removeChild(el);
+      const alert = document.getElementById('copyAlert');
+      alert.classList.remove('hidden');
+      setTimeout(() => alert.classList.add('hidden'), 2000);
+    });
+
+    /* Address Logics remain unchanged... */
     function ph_onPrefChange() {
       const p = document.getElementById('ph_pref').value;
       const s = document.getElementById('ph_city');
@@ -312,8 +343,6 @@
         cont.appendChild(d);
       });
     }
-
-    /* JP Address Logic */
     function jp_onPrefChange() {
       const p = document.getElementById('jp_pref').value;
       const s = document.getElementById('jp_city');
